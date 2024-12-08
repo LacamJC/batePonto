@@ -175,6 +175,60 @@ app.post('/baterSaida', (req,res) =>{
 
 })
 
+app.post('/gerarFolha', (req,res) =>{
+    console.log(yellowText("////// Gerando folha de ponto"))
+    var id = req.body.id 
+
+
+    bd_funcionarios.findOne({where : {id : id}})
+    .then(funcionario =>{
+        if(funcionario){
+            console.log(greenText("///// Funcionario encontrado"))
+            console.log(funcionario)
+
+            bd_folha_ponto.findAll({where : {funcionario : funcionario.id}})
+            .then(folha =>{
+                if(folha)
+                {
+                    const Pontos = []
+                    console.log(greenText("///// Folha do funcionario " + funcionario.nome + " encontrada"))
+                    const valores_id_folha = folha.map(folha => folha.id)
+                    const valores_id_funcionario = folha.map(folha => folha.funcionario)
+                    const valores_data = folha.map(folha => folha.data)
+                    const valores_entrada = folha.map(folha => folha.entrada)
+                    const valores_saida = folha.map(folha => folha.saida)
+                    // console.log(valores_id_folha);
+                    for(i=0 ; i < valores_id_folha.length; i++)
+                    {
+                        Pontos.push({
+                            id_folhas : valores_id_folha[i],
+                            id_funcionarios : valores_id_funcionario[i],
+                            data : valores_data[i],
+                            entrada : valores_entrada[i],
+                            saida : valores_saida[i]
+                        })
+                    }
+                    console.log(Pontos.length)
+
+
+
+                    res.render('../public/views/folhaPonto.ejs', {funcionario : funcionario, Pontos : Pontos})
+                }else{
+                    console.log("Folha não encontrada")
+                }
+            })
+            .catch(err =>{
+                console.log(redText("erro ao buscar folha no bacno de dados"))
+            })
+        }else{
+            console.log(redText("////// Funcionario nao encontrado"))
+        }
+    })
+    .catch(err =>{
+        console.log(redText("///// Erro consultar banco: "+ err))
+    })
+})
+
 app.listen(port, ()=>{
     console.log(greenText("Servidor aberto na porta: " + port))
 });

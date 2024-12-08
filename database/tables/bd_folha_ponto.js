@@ -13,7 +13,8 @@ const bd_folha_ponto = database.define('folha', {
     },
 
     data: {
-        type: Sequelize.DATEONLY
+        type: Sequelize.DATEONLY,
+        unique: true
     },
 
     entrada: {
